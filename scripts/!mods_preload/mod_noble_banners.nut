@@ -3,12 +3,12 @@
 ::mods_registerMod("mod_noble_banners", 1.0.1, "Noble Banners");
 ::mods_queue(null, ">mod_msu", function() {
 	
-	::mods_hookBaseClass("scenarios/world/starting_scenario", function(o) {
+	::mods_hookClass("scenarios/world/starting_scenario", function(o) {
 		
 		local onSpawnPlayer = ::mods_getMember(o, "onSpawnPlayer")
 		::mods_override(o, "onSpawnPlayer", function() {
 			onSpawnPlayer();
-			
+			this.logInfo("reassigning banners");
 			local nobles = this.World.FactionManager.getFactionsOfType(this.Const.FactionType.NobleHouse);
 			local northMost = null;
 			local houses = [];
@@ -54,6 +54,17 @@
 			houses[0].Faction.setBanner(northBanners[this.Math.rand(0, northBanners.len() - 1)]);
 			houses[1].Faction.setBanner(middleBanners[this.Math.rand(0, middleBanners.len() - 1)]);
 			houses[2].Faction.setBanner(southBanners[this.Math.rand(0, southBanners.len() - 1)]);
+			
+			foreach (n in nobles)
+			{
+				foreach (s in n.getSettlements())
+				{
+					logInfo("setting banner for: " + s.getName());
+					local location_banner = s.getSprite("location_banner");
+					location_banner.setBrush(n.getBannerSmall());
+					location_banner.Visible = true;
+				}
+			}
 			
 		});
 		
